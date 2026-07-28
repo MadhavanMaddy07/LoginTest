@@ -1,19 +1,30 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import API from "../services/Api";
-import { useNavigate } from "react-router-dom";
+import "../css/register.css";
 
 function Register() {
 
     const navigate = useNavigate();
 
+    const [loading, setLoading] = useState(false);
+
+    const [showPassword, setShowPassword] = useState(false);
+
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+    const [error, setError] = useState("");
+
+    const [success, setSuccess] = useState("");
+
     const [data, setData] = useState({
         username: "",
         email: "",
-        password: ""
+        password: "",
+        confirmPassword: ""
     });
 
     const handleChange = (e) => {
-
         setData({
             ...data,
             [e.target.name]: e.target.value
@@ -24,65 +35,269 @@ function Register() {
 
         e.preventDefault();
 
+        setError("");
+        setSuccess("");
+
+        if (data.password !== data.confirmPassword) {
+            setError("Passwords do not match.");
+            return;
+        }
+
         try {
 
-            await API.post("register/", data);
+            setLoading(true);
 
-            alert("Registration Successful");
+            await API.post("register/", {
+                username: data.username,
+                email: data.email,
+                password: data.password
+            });
 
-            navigate("/");
+            setSuccess("Registration Successful.");
 
-        } catch {
+            setTimeout(() => {
+                navigate("/");
+            }, 1500);
 
-            alert("Registration Failed");
+        } catch (err) {
+
+            setError("Registration Failed.");
+
+        } finally {
+
+            setLoading(false);
+
         }
+
     };
 
     return (
 
-        <div className="container mt-5">
+        <div className="register-page">
 
-            <div className="card p-4 mx-auto" style={{ maxWidth: "400px" }}>
+            <div className="container">
 
-                <h2 className="text-center mb-4">Register</h2>
+                <div className="row justify-content-center align-items-center vh-100">
 
-                <form onSubmit={register}>
+                    <div className="col-lg-5 col-md-7">
 
-                    <input
-                        className="form-control mb-3"
-                        placeholder="Username"
-                        name="username"
-                        onChange={handleChange}
-                    />
+                        <div className="card register-card shadow-lg">
 
-                    <input
-                        className="form-control mb-3"
-                        placeholder="Email"
-                        name="email"
-                        onChange={handleChange}
-                    />
+                            <div className="card-body p-5">
 
-                    <input
-                        type="password"
-                        className="form-control mb-3"
-                        placeholder="Password"
-                        name="password"
-                        onChange={handleChange}
-                    />
+                                <h2 className="text-center fw-bold">
+                                    Create Account
+                                </h2>
 
-                    <button className="btn btn-success w-100">
+                                <p className="text-center text-muted mb-4">
+                                    Join us today 🚀
+                                </p>
 
-                        Register
+                                {error &&
 
-                    </button>
+                                    <div className="alert alert-danger">
 
-                </form>
+                                        {error}
+
+                                    </div>
+
+                                }
+
+                                {success &&
+
+                                    <div className="alert alert-success">
+
+                                        {success}
+
+                                    </div>
+
+                                }
+
+                                <form onSubmit={register}>
+
+                                    <div className="mb-3">
+
+                                        <label className="form-label">
+                                            Username
+                                        </label>
+
+                                        <div className="input-group">
+
+                                            <span className="input-group-text">
+
+                                                <i className="bi bi-person"></i>
+
+                                            </span>
+
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                placeholder="Username"
+                                                name="username"
+                                                onChange={handleChange}
+                                                required
+                                            />
+
+                                        </div>
+
+                                    </div>
+
+                                    <div className="mb-3">
+
+                                        <label className="form-label">
+                                            Email
+                                        </label>
+
+                                        <div className="input-group">
+
+                                            <span className="input-group-text">
+
+                                                <i className="bi bi-envelope"></i>
+
+                                            </span>
+
+                                            <input
+                                                type="email"
+                                                className="form-control"
+                                                placeholder="Email"
+                                                name="email"
+                                                onChange={handleChange}
+                                                required
+                                            />
+
+                                        </div>
+
+                                    </div>
+
+                                    <div className="mb-3">
+
+                                        <label className="form-label">
+                                            Password
+                                        </label>
+
+                                        <div className="input-group">
+
+                                            <span className="input-group-text">
+
+                                                <i className="bi bi-lock"></i>
+
+                                            </span>
+
+                                            <input
+                                                type={showPassword ? "text" : "password"}
+                                                className="form-control"
+                                                placeholder="Password"
+                                                name="password"
+                                                onChange={handleChange}
+                                                required
+                                            />
+
+                                            <button
+                                                type="button"
+                                                className="btn btn-outline-secondary"
+                                                onClick={() =>
+                                                    setShowPassword(!showPassword)
+                                                }
+                                            >
+
+                                                <i className={showPassword ? "bi bi-eye-slash" : "bi bi-eye"}></i>
+
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div className="mb-4">
+
+                                        <label className="form-label">
+                                            Confirm Password
+                                        </label>
+
+                                        <div className="input-group">
+
+                                            <span className="input-group-text">
+
+                                                <i className="bi bi-lock-fill"></i>
+
+                                            </span>
+
+                                            <input
+                                                type={showConfirmPassword ? "text" : "password"}
+                                                className="form-control"
+                                                placeholder="Confirm Password"
+                                                name="confirmPassword"
+                                                onChange={handleChange}
+                                                required
+                                            />
+
+                                            <button
+                                                type="button"
+                                                className="btn btn-outline-secondary"
+                                                onClick={() =>
+                                                    setShowConfirmPassword(!showConfirmPassword)
+                                                }
+                                            >
+
+                                                <i className={showConfirmPassword ? "bi bi-eye-slash" : "bi bi-eye"}></i>
+
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+
+                                    <button
+                                        className="btn btn-primary w-100"
+                                        disabled={loading}
+                                    >
+
+                                        {loading ?
+
+                                            <>
+                                                <span className="spinner-border spinner-border-sm me-2"></span>
+                                                Creating Account...
+                                            </>
+
+                                            :
+
+                                            "Register"
+
+                                        }
+
+                                    </button>
+
+                                </form>
+
+                                <hr />
+
+                                <div className="text-center">
+
+                                    Already have an account?
+
+                                    <Link
+                                        to="/"
+                                        className="ms-2"
+                                    >
+                                        Login
+                                    </Link>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
 
             </div>
 
         </div>
 
     );
+
 }
 
 export default Register;
