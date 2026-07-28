@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import API from "../Api";
+import API from "../services/Api";
 
 function Dashboard() {
 

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import API from "../api";
+import API from "../services/Api";
 import "../css/login.css";
 
 export default function Login() {
